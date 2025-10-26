@@ -8,9 +8,15 @@ int sequentialSearchIterative(const vector<int>& a, int target) {
 }
 
 int sequentialSearchRecursive(const vector<int>& a, int target, int i = 0) {
-    (void)a; (void)target; (void)i; // not implemented
-    return -1;
+    if (i >= static_cast<int>(a.size())) {
+        return -1;
+    }
+    if (a[i] == target) {
+        return i;
+    }
+    return sequentialSearchRecursive(a, target, i + 1);
 }
+
 
 // Binary search (iterative)
 int binarySearchIterative(const vector<int>& a, int target) {

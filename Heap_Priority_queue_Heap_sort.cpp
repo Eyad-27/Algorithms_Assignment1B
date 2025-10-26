@@ -76,10 +76,25 @@ public:
     }
 };
 
-// Priority Queue
 struct PriorityQueue {
-    void insert(int /*value*/, int /*priority*/) { cout << "Priority Queue insert: \n"; }
-    int extractHighestPriority() { cout << "Priority Queue extract: \n"; return 0; }
+private:
+    priority_queue<pair<int, int>> pq;
+
+public:
+    void insert(int value, int priority) {
+        pq.push({priority, value});
+    }
+    int extractHighestPriority() {
+        if (pq.empty()) {
+            throw runtime_error("Priority Queue is empty");
+        }
+        int value = pq.top().second;
+        pq.pop();
+        return value;
+    }
+    bool empty() const {
+        return pq.empty();
+    }
 };
 
 // Heap Sort

@@ -21,10 +21,16 @@ static long long fib_divide_and_conquer(int n) {
 
 // Dynamic Programming placeholder.
 static long long fib_dynamic_programming(int n) {
-    if (n < 0) {
-        throw invalid_argument("n must be non-negative");
+    if (n < 0) throw invalid_argument("n must be non-negative");
+    if (n == 0) return 0;
+    if (n == 1) return 1;
+    long long a = 0, b = 1;
+    for (int i = 2; i <= n; ++i) {
+        long long c = a + b;
+        a = b;
+        b = c;
     }
-    return 0;
+    return b;
 }
 
 // Read a non-negative integer from standard input with prompt.
