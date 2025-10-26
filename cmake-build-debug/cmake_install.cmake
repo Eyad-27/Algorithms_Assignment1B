@@ -1,4 +1,4 @@
-# Install script for directory: C:/College/Third Year/First term/Algo/Assignment 2
+# Install script for directory: C:/College/Third Year/First term/Algo/Assignment 1/Algorithms_Assignment1B
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -40,7 +40,7 @@ endif()
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
 if(CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "C:/College/Third Year/First term/Algo/Assignment 2/cmake-build-debug/install_local_manifest.txt"
+  file(WRITE "C:/College/Third Year/First term/Algo/Assignment 1/Algorithms_Assignment1B/cmake-build-debug/install_local_manifest.txt"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()
 if(CMAKE_INSTALL_COMPONENT)
@@ -56,6 +56,6 @@ else()
 endif()
 
 if(NOT CMAKE_INSTALL_LOCAL_ONLY)
-  file(WRITE "C:/College/Third Year/First term/Algo/Assignment 2/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
+  file(WRITE "C:/College/Third Year/First term/Algo/Assignment 1/Algorithms_Assignment1B/cmake-build-debug/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")
 endif()
