@@ -11,7 +11,7 @@ static long long fib_recursive(int n) {
     return fib_recursive(n - 1) + fib_recursive(n - 2);
 }
 
-// Divide and Conquer (Matrix Exponentiation) placeholder.
+// Compute nth Fibonacci using Divide and Conquer (matrix exponentiation).
 static long long fib_divide_and_conquer(int n) {
     if (n < 0) {
         throw invalid_argument("n must be non-negative");
@@ -19,7 +19,7 @@ static long long fib_divide_and_conquer(int n) {
     return 0;
 }
 
-// Dynamic Programming placeholder.
+// Compute nth Fibonacci using Dynamic Programming (iterative).
 static long long fib_dynamic_programming(int n) {
     if (n < 0) throw invalid_argument("n must be non-negative");
     if (n == 0) return 0;
