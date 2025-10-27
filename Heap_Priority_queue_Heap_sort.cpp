@@ -78,25 +78,79 @@ public:
 
 struct PriorityQueue {
 private:
-    priority_queue<pair<int, int>> pq;
-
-public:
-    void insert(int value, int priority) {
-        pq.push({priority, value});
-    }
-    int extractHighestPriority() {
-        if (pq.empty()) {
-            throw runtime_error("Priority Queue is empty");
+    // Internal struct to store value-priority pairs
+    struct PQElement {
+        int value;
+        int priority;
+        PQElement(int v, int p) : value(v), priority(p) {}
+    };
+    
+    // MaxHeap modified to store PQElement
+    class PQMaxHeap {
+        vector<PQElement> a;
+        
+        void shiftUp(int i) {
+            while (i > 0) {
+                int p = (i - 1) / 2;
+                if (a[p].priority >= a[i].priority) break;
+                swap(a[p], a[i]);
+                i = p;
+            }
         }
-        int value = pq.top().second;
-        pq.pop();
-        return value;
+        
+        void shiftDown(int i) {
+            int n = (int)a.size();
+            while (true) {
+                int l = 2 * i + 1, r = 2 * i + 2, largest = i;
+                if (l < n && a[l].priority > a[largest].priority) largest = l;
+                if (r < n && a[r].priority > a[largest].priority) largest = r;
+                if (largest == i) break;
+                swap(a[i], a[largest]);
+                i = largest;
+            }
+        }
+    
+    public:
+        void insert(int value, int priority) {
+            a.push_back(PQElement(value, priority));
+            shiftUp((int)a.size() - 1);
+        }
+        
+        bool empty() const { return a.empty(); }
+        
+        pair<int, int> extractMax() {
+            if (a.empty()) return {INT_MIN, INT_MIN};
+            pair<int, int> ans = {a[0].value, a[0].priority};
+            a[0] = a.back();
+            a.pop_back();
+            if (!a.empty()) shiftDown(0);
+            return ans;
+        }
+    };
+    
+    PQMaxHeap heap;
+    
+public:
+    // Insert a value with its priority
+    void insert(int value, int priority) {
+        heap.insert(value, priority);
     }
+    
+    // Extract the element with highest priority
+    pair<int, int> extractHighestPriority() {
+        if (heap.empty()) {
+            cout << "Priority Queue is empty\n";
+            return {INT_MIN, INT_MIN};
+        }
+        auto result = heap.extractMax();
+        cout << "Extracted: value = " << result.first << ", priority = " << result.second << "\n";
+        return result;
+    }
+    
     bool empty() const {
-        return pq.empty();
+        return heap.empty();
     }
 };
-
 // Heap Sort
 static void heapSort(vector<int>& /*arr*/) {
     cout << "Heap Sort: \n";
