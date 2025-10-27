@@ -77,126 +77,39 @@ public:
 };
 
 struct PriorityQueue {
-    // Internal struct to store value-priority pairs
-    struct Item {
-        int value;
-        int priority;
-        Item(int v, int p) : value(v), priority(p) {}
-    };
+    MaxHeap internalHeap;
+    // We use a mask to encode the priority and value. 
+    // This assumes priority and value are less than 10000.
+    const int ENCODING_MASK = 10000;
 
-    class MaxHeap {
-        vector<Item> a;
-        
-        void shiftUp(int i) {
-            while (i > 0) {
-                int p = (i - 1) / 2;
-                if (a[p].priority >= a[i].priority) break;
-                swap(a[p], a[i]);
-                i = p;
-            }
-        }
-        
-        void shiftDown(int i) {
-            int n = (int)a.size();
-            while (true) {
-                int l = 2 * i + 1, r = 2 * i + 2, largest = i;
-                if (l < n && a[l].priority > a[largest].priority) largest = l;
-                if (r < n && a[r].priority > a[largest].priority) largest = r;
-                if (largest == i) break;
-                swap(a[i], a[largest]);
-                i = largest;
-            }
-        }
-        
-    public:
-        void insert(Item x) { 
-            a.push_back(x); 
-            shiftUp((int)a.size() - 1); 
-        }
-        
-        bool empty() const { return a.empty(); }
-        
-        Item extractMax() {
-            if (a.empty()) return Item(0, INT_MIN);
-            Item ans = a[0];
-            a[0] = a.back(); 
-            a.pop_back();
-            if (!a.empty()) shiftDown(0);
-            return ans;
-        }
-    };
-
-    class MinHeap {
-        vector<Item> a;
-        void shiftUp(int i) {
-            while (i > 0) {
-                int p = (i - 1) / 2;
-                if (a[p].priority <= a[i].priority) break;
-                swap(a[p], a[i]);
-                i = p;
-            }
-        }
-        
-        void shiftDown(int i) {
-            int n = (int)a.size();
-            while (true) {
-                int l = 2 * i + 1, r = 2 * i + 2, smallest = i;
-                if (l < n && a[l].priority < a[smallest].priority) smallest = l;
-                if (r < n && a[r].priority < a[smallest].priority) smallest = r;
-                if (smallest == i) break;
-                swap(a[i], a[smallest]);
-                i = smallest;
-            }
-        }
-        
-    public:
-        void insert(Item x) { 
-            a.push_back(x); 
-            shiftUp((int)a.size() - 1); 
-        }
-        
-        bool empty() const { return a.empty(); }
-        
-        Item extractMin() {
-            if (a.empty()) return Item(0, INT_MAX);
-            Item ans = a[0];
-            a[0] = a.back(); 
-            a.pop_back();
-            if (!a.empty()) shiftDown(0);
-            return ans;
-        }
-    };
-
-    MaxHeap maxHeap;
-    MinHeap minHeap;
-    bool useMaxHeap; // Flag to determine which heap to use
-
-    // Constructor to set heap type (true for max-heap, false for min-heap)
-    PriorityQueue(bool useMax = true) : useMaxHeap(useMax) {}
-
+    // Inserts an element (value) with a given priority.
     void insert(int value, int priority) {
-        Item item(value, priority);
-        if (useMaxHeap) {
-            maxHeap.insert(item);
-        } else {
-            minHeap.insert(item);
-        }
+        // Encode: priority * MASK + value.
+        // Higher priority results in a larger encoded key, which MaxHeap will place at the top.
+        // If priorities are equal, the higher value will be selected next.
+        int encoded = priority * ENCODING_MASK + value;
+        internalHeap.insert(encoded);
+        cout << "Priority Queue: Inserted (Value: " << value << ", Priority: " << priority << "). Encoded Key: " << encoded << "\n";
     }
 
+    // Extracts the value of the item with the highest priority.
     int extractHighestPriority() {
-        if (useMaxHeap) {
-            Item item = maxHeap.extractMax();
-            return item.value;
-        } else {
-            Item item = minHeap.extractMin();
-            return item.value;
+        if (internalHeap.empty()) {
+            cout << "Priority Queue: Cannot extract, the queue is empty. Returning 0 (sentinel).\n";
+            return 0; 
         }
-    }
+        // Extract the maximum encoded key from the MaxHeap
+        int encoded = internalHeap.extractMax();
+        
+        // Decode the original value (LSB) from the encoded key: value = encoded % MASK
+        int extractedValue = encoded % ENCODING_MASK;
+        int extractedPriority = encoded / ENCODING_MASK; // For logging
 
-    bool empty() const {
-        return useMaxHeap ? maxHeap.empty() : minHeap.empty();
+        cout << "Priority Queue: Extracted (Value: " << extractedValue << ", Priority: " << extractedPriority << ").\n";
+        return extractedValue;
     }
 };
+
 
 // Heap Sort
 static void heapSort(vector<int>& /*arr*/) {
@@ -243,28 +156,29 @@ static void runHeapDemo() {
     }
 }
 static void runPriorityQueue() {
-    cout << "Choose priority queue type:\n1) Max Priority (highest first)\n2) Min Priority (lowest first)\n";
-    int type = readInt("Type: ");
-    while (type != 1 && type != 2) {
-        cout << "Invalid type. Choose 1 or 2.\n";
-        type = readInt("Type: ");
-    }
-    PriorityQueue pq(type == 1); // true for max-heap, false for min-heap
+    PriorityQueue pq;
     
     int n = readInt("Enter number of elements to insert: ");
     while (n <= 0) { 
         cout << "Invalid n\n"; 
         n = readInt("Enter number of elements: "); 
     }
+    
     cout << "Enter " << n << " value-priority pairs:\n";
     for (int i = 0; i < n; ++i) {
         int value = readInt("Value: ");
         int priority = readInt("Priority: ");
         pq.insert(value, priority);
     }
-    cout << "Extracting elements by " << (type == 1 ? "highest" : "lowest") << " priority:\n";
-    while (!pq.empty()) {
-        cout << "Extracted value: " << pq.extractHighestPriority() << "\n";
+    
+    cout << "\nExtracting all elements by highest priority:\n";
+    // Extract all elements from the queue
+    for (int i = 0; i < n; i++) {
+        int extracted = pq.extractHighestPriority();
+        if (extracted == 0) {
+            cout << "Queue is empty, stopping extraction.\n";
+            break;
+        }
     }
 }
 static void printMenu() {
