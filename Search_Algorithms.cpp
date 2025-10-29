@@ -3,10 +3,15 @@ using namespace std;
 
 // Sequential search
 int sequentialSearchIterative(const vector<int>& a, int target) {
-    (void)a; (void)target; // not implemented
+    for(int i =0 ;i<a.size();i++){
+        if(a[i]==target){
+            return i;
+        }
+    }
     return -1;
 }
 
+// Recursive Sequential Search 
 int sequentialSearchRecursive(const vector<int>& a, int target, int i = 0) {
     if (i >= static_cast<int>(a.size())) {
         return -1;

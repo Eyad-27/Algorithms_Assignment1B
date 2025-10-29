@@ -1,7 +1,22 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+//---------------------------------------- Robust integer input helper-----------------------------------------------------------
+
+static int readInt(const string& prompt) {
+    for (;;) {
+        if (!prompt.empty()) cout << prompt;
+        int x;
+        if (cin >> x) return x;
+        cout << "Invalid input. Try again.\n";
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+}
+
 // Simple MaxHeap and MinHeap implementations
+//----------------------------------------Max Heap-----------------------------------------------------------
+
 class MaxHeap {
     vector<int> a;
     void shiftUp(int i) {
@@ -38,6 +53,7 @@ public:
         return ans;
     }
 };
+//---------------------------------------- Min Heap-----------------------------------------------------------
 
 class MinHeap {
     vector<int> a;
@@ -75,6 +91,7 @@ public:
         return ans;
     }
 };
+//---------------------------------------- priority queue-----------------------------------------------------------
 
 struct PriorityQueue {
     MaxHeap internalHeap;
@@ -111,22 +128,64 @@ struct PriorityQueue {
 };
 
 
-// Heap Sort
-static void heapSort(vector<int>& /*arr*/) {
-    cout << "Heap Sort: \n";
+//---------------------------------------- Heap Sort-----------------------------------------------------------
+
+void heapify(vector<int>&arr,int n,int position){
+  int l=2*position+1,
+      r=2*position+2,
+      max=position;
+  
+      if(l<n&&arr[l]>arr[max])
+      max=l;
+      if(r<n&&arr[r]>arr[max])
+      max=r;
+      if (max!=position){
+      swap(arr[position],arr[max]);
+      heapify(arr,n,max);
+  }
+  } 
+void buildheap(vector<int>&r){
+  for(int i=(r.size()/2)-1;i>=0;i--){
+    heapify(r,r.size(),i);
+  }
+
+
 }
 
-// Robust integer input helper
-static int readInt(const string& prompt) {
-    for (;;) {
-        if (!prompt.empty()) cout << prompt;
-        int x;
-        if (cin >> x) return x;
-        cout << "Invalid input. Try again.\n";
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+static void heapSort(vector<int>&arr){
+    buildheap(arr);
+    for(int i=arr.size()-1;i>=0;i--){
+       swap(arr[0],arr[i]);
+       heapify(arr,i,0) ; 
+
+
     }
 }
+void runHeapSort(){
+vector <int> array;
+
+int size=readInt("write the size of the array ");
+while(size<=0){
+cout<< "invalid number please write positive number \n";
+int size=readInt("write the size of the array \n");
+
+}
+cout << "Enter " << size << " integers:\n";
+for(int i =0;i<size;i++){
+int input=readInt("");
+
+array.push_back(input);
+}
+heapSort(array);
+cout<<"after Sorting \n";
+for(int i =0;i<size;i++){
+cout<< array[i]<<' ' ;
+}
+cout<<endl;
+}
+
+
+
 
 static void runHeapDemo() {
     cout << "Choose heap type: 1) Max Heap  2) Min Heap\n";
@@ -196,7 +255,9 @@ int main() {
         if (choice == 0) break;
         if (choice == 1) runHeapDemo();
         else if (choice == 2) runPriorityQueue(); 
-        else if (choice == 3) { vector<int> a; heapSort(a); }
+        else if (choice == 3) { runHeapSort();
+             
+             }
         else cout << "Unknown option\n";
     }
     cout << "Goodbye!\n";

@@ -1,5 +1,0 @@
-C:/College/Third Year/First term/Algo/Assignment 1/Algorithms_Assignment1B/cmake-build-debug/CMakeFiles/Fibonacci_Series.dir
-C:/College/Third Year/First term/Algo/Assignment 1/Algorithms_Assignment1B/cmake-build-debug/CMakeFiles/Heap_Priority_queue.dir
-C:/College/Third Year/First term/Algo/Assignment 1/Algorithms_Assignment1B/cmake-build-debug/CMakeFiles/Search_Algorithms.dir
-C:/College/Third Year/First term/Algo/Assignment 1/Algorithms_Assignment1B/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/College/Third Year/First term/Algo/Assignment 1/Algorithms_Assignment1B/cmake-build-debug/CMakeFiles/rebuild_cache.dir
