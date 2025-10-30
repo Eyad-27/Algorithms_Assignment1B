@@ -12,12 +12,58 @@ static long long fib_recursive(int n) {
 }
 
 // Compute nth Fibonacci using Divide and Conquer (matrix exponentiation).
+
+// multiply matrix
+
+vector<vector<long long>> multiply2x2Matrices(const vector<vector<long long>> &arr1,
+  const vector<vector<long long>> &arr2) {
+vector<vector<long long>> result(2, vector<long long>(2));
+
+result[0][0] = arr1[0][0] * arr2[0][0] + arr1[0][1] * arr2[1][0];
+result[0][1] = arr1[0][0] * arr2[0][1] + arr1[0][1] * arr2[1][1];
+result[1][0] = arr1[1][0] * arr2[0][0] + arr1[1][1] * arr2[1][0];
+result[1][1] = arr1[1][0] * arr2[0][1] + arr1[1][1] * arr2[1][1];
+
+return result;
+}
+
+
+//power matrix
+vector<vector<long long>> powerMatrix(vector<vector<long long>> &arr, long long n) {
+    // Base case
+    if (n == 0)  return {{1, 0}, {0, 1}};
+
+    // Recursive case
+    vector<vector<long long>> half = powerMatrix(arr, n / 2);
+
+    if (n % 2 == 0)
+
+        return multiply2x2Matrices(half,half);
+    else
+
+        return multiply2x2Matrices(arr,multiply2x2Matrices(half,half)) ;
+}
+
 static long long fib_divide_and_conquer(int n) {
+
+
     if (n < 0) {
         throw invalid_argument("n must be non-negative");
+    }else{
+        if(n==0){
+            return 0;
+        }else if(n==1||n==2){
+            return 1;
+        }else{
+            vector<vector<long long>> Base = {{1, 1}, 
+                                              {1, 0}};
+            Base =  powerMatrix(Base,n-1);
+
+            return Base[0][0];
+        }
     }
     
-    return 0;
+    return -1;
 }
 
 // Compute nth Fibonacci using Dynamic Programming (iterative).
