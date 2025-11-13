@@ -151,9 +151,38 @@ public:
         return heap.empty();
     }
 };
-// Heap Sort
-static void heapSort(vector<int>& /*arr*/) {
-    cout << "Heap Sort: \n";
+//---------------------------------------- Heap Sort-----------------------------------------------------------
+
+void heapify(vector<int>&arr,int n,int position){
+  int l=2*position+1,
+      r=2*position+2,
+      max=position;
+  
+      if(l<n&&arr[l]>arr[max])
+      max=l;
+      if(r<n&&arr[r]>arr[max])
+      max=r;
+      if (max!=position){
+      swap(arr[position],arr[max]);
+      heapify(arr,n,max);
+  }
+  } 
+void buildheap(vector<int>&r){
+  for(int i=(r.size()/2)-1;i>=0;i--){
+    heapify(r,r.size(),i);
+  }
+
+
+}
+
+static void heapSort(vector<int>&arr){
+    buildheap(arr);
+    for(int i=arr.size()-1;i>=0;i--){
+       swap(arr[0],arr[i]);
+       heapify(arr,i,0) ; 
+
+
+    }
 }
 
 // Robust integer input helper
@@ -216,4 +245,5 @@ int main() {
     }
     cout << "Goodbye!\n";
     return 0;
+
 }
