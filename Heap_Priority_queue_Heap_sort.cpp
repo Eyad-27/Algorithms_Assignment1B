@@ -1,7 +1,22 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+//---------------------------------------- Robust integer input helper-----------------------------------------------------------
+
+static int readInt(const string& prompt) {
+    for (;;) {
+        if (!prompt.empty()) cout << prompt;
+        int x;
+        if (cin >> x) return x;
+        cout << "Invalid input. Try again.\n";
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    }
+}
+
 // Simple MaxHeap and MinHeap implementations
+//----------------------------------------Max Heap-----------------------------------------------------------
+
 class MaxHeap {
     vector<int> a;
     void shiftUp(int i) {
@@ -38,6 +53,7 @@ public:
         return ans;
     }
 };
+//---------------------------------------- Min Heap-----------------------------------------------------------
 
 class MinHeap {
     vector<int> a;
@@ -75,89 +91,50 @@ public:
         return ans;
     }
 };
+//---------------------------------------- priority queue-----------------------------------------------------------
 
 struct PriorityQueue {
-private:
-    // Internal struct to store value-priority pairs
-    struct PQElement {
-        int value;
-        int priority;
-        PQElement(int v, int p) : value(v), priority(p) {}
-    };
-    
-    // MaxHeap modified to store PQElement
-    class PQMaxHeap {
-        vector<PQElement> a;
-        
-        void shiftUp(int i) {
-            while (i > 0) {
-                int p = (i - 1) / 2;
-                if (a[p].priority >= a[i].priority) break;
-                swap(a[p], a[i]);
-                i = p;
-            }
-        }
-        
-        void shiftDown(int i) {
-            int n = (int)a.size();
-            while (true) {
-                int l = 2 * i + 1, r = 2 * i + 2, largest = i;
-                if (l < n && a[l].priority > a[largest].priority) largest = l;
-                if (r < n && a[r].priority > a[largest].priority) largest = r;
-                if (largest == i) break;
-                swap(a[i], a[largest]);
-                i = largest;
-            }
-        }
-    
-    public:
-        void insert(int value, int priority) {
-            a.push_back(PQElement(value, priority));
-            shiftUp((int)a.size() - 1);
-        }
-        
-        bool empty() const { return a.empty(); }
-        
-        pair<int, int> extractMax() {
-            if (a.empty()) return {INT_MIN, INT_MIN};
-            pair<int, int> ans = {a[0].value, a[0].priority};
-            a[0] = a.back();
-            a.pop_back();
-            if (!a.empty()) shiftDown(0);
-            return ans;
-        }
-    };
-    
-    PQMaxHeap heap;
-    
-public:
-    // Insert a value with its priority
+    MaxHeap internalHeap;
+    // We use a mask to encode the priority and value.
+    // This assumes priority and value are less than 10000.
+    const int ENCODING_MASK = 10000;
+
+    // Inserts an element (value) with a given priority.
     void insert(int value, int priority) {
-        heap.insert(value, priority);
+        // Encode: priority * MASK + value.
+        // Higher priority results in a larger encoded key, which MaxHeap will place at the top.
+        // If priorities are equal, the higher value will be selected next.
+        int encoded = priority * ENCODING_MASK + value;
+        internalHeap.insert(encoded);
+        cout << "Priority Queue: Inserted (Value: " << value << ", Priority: " << priority << "). Encoded Key: " << encoded << "\n";
     }
-    
-    // Extract the element with highest priority
-    pair<int, int> extractHighestPriority() {
-        if (heap.empty()) {
-            cout << "Priority Queue is empty\n";
-            return {INT_MIN, INT_MIN};
+
+    // Extracts the value of the item with the highest priority.
+    int extractHighestPriority() {
+        if (internalHeap.empty()) {
+            cout << "Priority Queue: Cannot extract, the queue is empty. Returning 0 (sentinel).\n";
+            return 0;
         }
-        auto result = heap.extractMax();
-        cout << "Extracted: value = " << result.first << ", priority = " << result.second << "\n";
-        return result;
-    }
-    
-    bool empty() const {
-        return heap.empty();
+        // Extract the maximum encoded key from the MaxHeap
+        int encoded = internalHeap.extractMax();
+
+        // Decode the original value (LSB) from the encoded key: value = encoded % MASK
+        int extractedValue = encoded % ENCODING_MASK;
+        int extractedPriority = encoded / ENCODING_MASK; // For logging
+
+        cout << "Priority Queue: Extracted (Value: " << extractedValue << ", Priority: " << extractedPriority << ").\n";
+        return extractedValue;
     }
 };
+
+
 //---------------------------------------- Heap Sort-----------------------------------------------------------
 
 void heapify(vector<int>&arr,int n,int position){
   int l=2*position+1,
       r=2*position+2,
       max=position;
-  
+
       if(l<n&&arr[l]>arr[max])
       max=l;
       if(r<n&&arr[r]>arr[max])
@@ -166,7 +143,7 @@ void heapify(vector<int>&arr,int n,int position){
       swap(arr[position],arr[max]);
       heapify(arr,n,max);
   }
-  } 
+  }
 void buildheap(vector<int>&r){
   for(int i=(r.size()/2)-1;i>=0;i--){
     heapify(r,r.size(),i);
@@ -179,23 +156,36 @@ static void heapSort(vector<int>&arr){
     buildheap(arr);
     for(int i=arr.size()-1;i>=0;i--){
        swap(arr[0],arr[i]);
-       heapify(arr,i,0) ; 
+       heapify(arr,i,0) ;
 
 
     }
 }
+void runHeapSort(){
+vector <int> array;
 
-// Robust integer input helper
-static int readInt(const string& prompt) {
-    for (;;) {
-        if (!prompt.empty()) cout << prompt;
-        int x;
-        if (cin >> x) return x;
-        cout << "Invalid input. Try again.\n";
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-    }
+int size=readInt("write the size of the array ");
+while(size<=0){
+cout<< "invalid number please write positive number \n";
+int size=readInt("write the size of the array \n");
+
 }
+cout << "Enter " << size << " integers:\n";
+for(int i =0;i<size;i++){
+int input=readInt("");
+
+array.push_back(input);
+}
+heapSort(array);
+cout<<"after Sorting \n";
+for(int i =0;i<size;i++){
+cout<< array[i]<<' ' ;
+}
+cout<<endl;
+}
+
+
+
 
 static void runHeapDemo() {
     cout << "Choose heap type: 1) Max Heap  2) Min Heap\n";
@@ -224,7 +214,32 @@ static void runHeapDemo() {
         cout << "Unknown type\n";
     }
 }
+static void runPriorityQueue() {
+    PriorityQueue pq;
 
+    int n = readInt("Enter number of elements to insert: ");
+    while (n <= 0) {
+        cout << "Invalid n\n";
+        n = readInt("Enter number of elements: ");
+    }
+
+    cout << "Enter " << n << " value-priority pairs:\n";
+    for (int i = 0; i < n; ++i) {
+        int value = readInt("Value: ");
+        int priority = readInt("Priority: ");
+        pq.insert(value, priority);
+    }
+
+    cout << "\nExtracting all elements by highest priority:\n";
+    // Extract all elements from the queue
+    for (int i = 0; i < n; i++) {
+        int extracted = pq.extractHighestPriority();
+        if (extracted == 0) {
+            cout << "Queue is empty, stopping extraction.\n";
+            break;
+        }
+    }
+}
 static void printMenu() {
     cout << "\nHeap / Priority Queue / Heap Sort\n";
     cout << "1) Heap (Max/Min)\n";
@@ -239,37 +254,12 @@ int main() {
         int choice = readInt("Choose: ");
         if (choice == 0) break;
         if (choice == 1) runHeapDemo();
-else if (choice == 2) {
-    PriorityQueue pq;
-    while (true) {
-        cout << "\nPriority Queue Menu:\n";
-        cout << "1) Insert element\n";
-        cout << "2) Extract highest priority\n";
-        cout << "0) Back to main menu\n";
+        else if (choice == 2) runPriorityQueue();
+        else if (choice == 3) { runHeapSort();
 
-        int op = readInt("Choose: ");
-        if (op == 0) break;
-
-        if (op == 1) {
-            int v = readInt("Enter value: ");
-            int p = readInt("Enter priority: ");
-            pq.insert(v, p);
-            cout << "Inserted (" << v << ", priority = " << p << ")\n";
-        }
-        else if (op == 2) {
-            pq.extractHighestPriority();
-        }
-        else {
-            cout << "Invalid option.\n";
-        }
-    }
-}
-
-        else if (choice == 3) { vector<int> a; heapSort(a); }
+             }
         else cout << "Unknown option\n";
     }
     cout << "Goodbye!\n";
     return 0;
-
 }
-
