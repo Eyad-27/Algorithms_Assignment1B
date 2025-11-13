@@ -239,7 +239,32 @@ int main() {
         int choice = readInt("Choose: ");
         if (choice == 0) break;
         if (choice == 1) runHeapDemo();
-        else if (choice == 2) { PriorityQueue pq; pq.insert(0, 0); pq.extractHighestPriority(); }
+else if (choice == 2) {
+    PriorityQueue pq;
+    while (true) {
+        cout << "\nPriority Queue Menu:\n";
+        cout << "1) Insert element\n";
+        cout << "2) Extract highest priority\n";
+        cout << "0) Back to main menu\n";
+
+        int op = readInt("Choose: ");
+        if (op == 0) break;
+
+        if (op == 1) {
+            int v = readInt("Enter value: ");
+            int p = readInt("Enter priority: ");
+            pq.insert(v, p);
+            cout << "Inserted (" << v << ", priority = " << p << ")\n";
+        }
+        else if (op == 2) {
+            pq.extractHighestPriority();
+        }
+        else {
+            cout << "Invalid option.\n";
+        }
+    }
+}
+
         else if (choice == 3) { vector<int> a; heapSort(a); }
         else cout << "Unknown option\n";
     }
@@ -247,3 +272,4 @@ int main() {
     return 0;
 
 }
+
