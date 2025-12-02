@@ -29,7 +29,7 @@ class Heap {
         }
     }
 
-  void shiftDown(int i,int size=-1) {
+    void shiftDown(int i,int size=-1) {
         int n = (int)a.size();
         if (size!=-1)
             n=size;
@@ -54,7 +54,7 @@ public:
     void heapify() {
         for (int i = (int)a.size() / 2 - 1; i >= 0; --i) shiftDown(i);
     }
-  void heapSortHelper(){
+    void heapSortHelper(){
 
         for(int i=a.size()-1;i>=0;i--){
             swap(a[0],a[i]);
@@ -141,7 +141,6 @@ struct PriorityQueue
 };
 
 static void heapSort(vector<int> &arr) {
-    cout << "[HeapSort] TODO: not implemented yet.\n";
     Heap MaxHeap = Heap();
     MaxHeap.build(arr);
     MaxHeap.heapSortHelper();
@@ -212,12 +211,8 @@ static void runHeapSortDemo() {
     vector<int> a(n);
     cout << "Enter " << n << " integers:\n";
     for (int i = 0; i < n; ++i) a[i] = readInt("");
-    heapSort(a);
-
 
     cout << "After heapSort:\n";
-    for (int x : a) cout << x << ' ';
-    cout << '\n';
     heapSort(a);
 }
 
