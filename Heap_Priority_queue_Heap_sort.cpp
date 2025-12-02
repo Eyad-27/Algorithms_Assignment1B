@@ -1,9 +1,8 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-//---------------------------------------- Robust integer input helper-----------------------------------------------------------
-
-static int readInt(const string& prompt) {
+// ------------ Simple robust integer input (no exceptions needed) ------------
+static int readInt(const string &prompt) {
     for (;;) {
         if (!prompt.empty()) cout << prompt;
         int x;
@@ -14,232 +13,181 @@ static int readInt(const string& prompt) {
     }
 }
 
-// Simple MaxHeap and MinHeap implementations
-//----------------------------------------Max Heap-----------------------------------------------------------
-
-class MaxHeap {
+// ========================== Core Heap ===========================
+class Heap {
     vector<int> a;
+    bool isMax; // true => Max-Heap, false => Min-Heap
+
+    bool better(int x, int y) const { return isMax ? (x > y) : (x < y); }
+
     void shiftUp(int i) {
         while (i > 0) {
             int p = (i - 1) / 2;
-            if (a[p] >= a[i]) break;
-            swap(a[p], a[i]);
+            if (!better(a[i], a[p])) break;
+            swap(a[i], a[p]);
             i = p;
         }
     }
+
     void shiftDown(int i) {
         int n = (int)a.size();
         while (true) {
-            int l = 2 * i + 1, r = 2 * i + 2, largest = i;
-            if (l < n && a[l] > a[largest]) largest = l;
-            if (r < n && a[r] > a[largest]) largest = r;
-            if (largest == i) break;
-            swap(a[i], a[largest]);
-            i = largest;
+            int l = 2 * i + 1, r = 2 * i + 2, best = i;
+            if (l < n && better(a[l], a[best])) best = l;
+            if (r < n && better(a[r], a[best])) best = r;
+            if (best == i) break;
+            swap(a[i], a[best]);
+            i = best;
         }
     }
+
 public:
-    void build(const vector<int>& v) {
+    explicit Heap(bool asMaxHeap = true) : isMax(asMaxHeap) {}
+
+    void build(const vector<int> &v) {
         a = v;
+        heapify();
+    }
+
+    void heapify() {
         for (int i = (int)a.size() / 2 - 1; i >= 0; --i) shiftDown(i);
     }
-    void insert(int x) { a.push_back(x); shiftUp((int)a.size() - 1); }
+
+    void insert(int x) {
+        a.push_back(x);
+        shiftUp((int)a.size() - 1);
+    }
+
     bool empty() const { return a.empty(); }
-    int extractMax() {
-        if (a.empty()) return INT_MIN;
-        int ans = a[0];
-        a[0] = a.back(); a.pop_back();
-        if (!a.empty()) shiftDown(0);
-        return ans;
-    }
-};
-//---------------------------------------- Min Heap-----------------------------------------------------------
+    int size() const { return (int)a.size(); }
 
-class MinHeap {
-    vector<int> a;
-    void shiftUp(int i) {
-        while (i > 0) {
-            int p = (i - 1) / 2;
-            if (a[p] <= a[i]) break;
-            swap(a[p], a[i]);
-            i = p;
-        }
-    }
-    void shiftDown(int i) {
-        int n = (int)a.size();
-        while (true) {
-            int l = 2 * i + 1, r = 2 * i + 2, smallest = i;
-            if (l < n && a[l] < a[smallest]) smallest = l;
-            if (r < n && a[r] < a[smallest]) smallest = r;
-            if (smallest == i) break;
-            swap(a[i], a[smallest]);
-            i = smallest;
-        }
-    }
-public:
-    void build(const vector<int>& v) {
-        a = v;
-        for (int i = (int)a.size() / 2 - 1; i >= 0; --i) shiftDown(i);
-    }
-    void insert(int x) { a.push_back(x); shiftUp((int)a.size() - 1); }
-    bool empty() const { return a.empty(); }
-    int extractMin() {
-        if (a.empty()) return INT_MAX;
-        int ans = a[0];
-        a[0] = a.back(); a.pop_back();
-        if (!a.empty()) shiftDown(0);
-        return ans;
-    }
-};
-//---------------------------------------- priority queue-----------------------------------------------------------
-
-struct PriorityQueue {
-    MaxHeap internalHeap;
-    // We use a mask to encode the priority and value.
-    // This assumes priority and value are less than 10000.
-    const int ENCODING_MASK = 10000;
-
-    // Inserts an element (value) with a given priority.
-    void insert(int value, int priority) {
-        // Encode: priority * MASK + value.
-        // Higher priority results in a larger encoded key, which MaxHeap will place at the top.
-        // If priorities are equal, the higher value will be selected next.
-        int encoded = priority * ENCODING_MASK + value;
-        internalHeap.insert(encoded);
-        cout << "Priority Queue: Inserted (Value: " << value << ", Priority: " << priority << "). Encoded Key: " << encoded << "\n";
-    }
-
-    // Extracts the value of the item with the highest priority.
-    int extractHighestPriority() {
-        if (internalHeap.empty()) {
-            cout << "Priority Queue: Cannot extract, the queue is empty. Returning 0 (sentinel).\n";
+    // Return top element (max for max-heap, min for min-heap). If empty, prints and returns 0.
+    int extractTop() {
+        if (a.empty()) {
+            cout << "Heap is empty. Returning 0 (sentinel).\n";
             return 0;
         }
-        // Extract the maximum encoded key from the MaxHeap
-        int encoded = internalHeap.extractMax();
+        int top = a[0];
+        a[0] = a.back();
+        a.pop_back();
+        if (!a.empty()) shiftDown(0);
+        return top;
+    }
 
-        // Decode the original value (LSB) from the encoded key: value = encoded % MASK
-        int extractedValue = encoded % ENCODING_MASK;
-        int extractedPriority = encoded / ENCODING_MASK; // For logging
+    int top() const { return a.empty() ? 0 : a[0]; }
+};
 
-        cout << "Priority Queue: Extracted (Value: " << extractedValue << ", Priority: " << extractedPriority << ").\n";
-        return extractedValue;
+struct MaxHeap {
+    Heap h{true};
+    void build(const vector<int> &v) { h.build(v); }
+    void heapify() { h.heapify(); }
+    void insert(int x) { h.insert(x); }
+    bool empty() const { return h.empty(); }
+    int extractMax() { return h.extractTop(); }
+};
+
+struct MinHeap {
+    Heap h{false};
+    void build(const vector<int> &v) { h.build(v); }
+    void heapify() { h.heapify(); }
+    void insert(int x) { h.insert(x); }
+    bool empty() const { return h.empty(); }
+    int extractMin() { return h.extractTop(); }
+};
+
+// =============================== Priority Queue ===============================
+// Priority Queue (to be completed by teammates). Suggested: use MaxHeap inside.
+class PriorityQueue {
+public:
+    void insert(int value, int priority) {
+        // TODO: Implement using MaxHeap with a (priority, value) encoding or pair.
+        // For now, just a stub so the program compiles and the menu runs.
+        cout << "[PQ] insert(value=" << value << ", priority=" << priority << ") -> TODO\n";
+    }
+    int extractHighestPriority() {
+        // TODO: Implement using the underlying MaxHeap instance.
+        cout << "[PQ] extractHighestPriority() -> TODO, returning 0\n";
+        return 0;
     }
 };
 
-
-//---------------------------------------- Heap Sort-----------------------------------------------------------
-
-void heapify(vector<int>&arr,int n,int position){
-  int l=2*position+1,
-      r=2*position+2,
-      max=position;
-
-      if(l<n&&arr[l]>arr[max])
-      max=l;
-      if(r<n&&arr[r]>arr[max])
-      max=r;
-      if (max!=position){
-      swap(arr[position],arr[max]);
-      heapify(arr,n,max);
-  }
-  }
-void buildheap(vector<int>&r){
-  for(int i=(r.size()/2)-1;i>=0;i--){
-    heapify(r,r.size(),i);
-  }
-
-
+// =============================== Heap Sort ===============================
+// Heap Sort (to be completed by teammates). Suggested: build MaxHeap then extract.
+static void heapSort(vector<int> &arr) {
+    // TODO: Implement using MaxHeap: build(arr), then repeatedly extractMax into the end.
+    cout << "[HeapSort] TODO: not implemented yet.\n";
 }
 
-static void heapSort(vector<int>&arr){
-    buildheap(arr);
-    for(int i=arr.size()-1;i>=0;i--){
-       swap(arr[0],arr[i]);
-       heapify(arr,i,0) ;
-
-
-    }
-}
-void runHeapSort(){
-vector <int> array;
-
-int size=readInt("write the size of the array ");
-while(size<=0){
-cout<< "invalid number please write positive number \n";
-int size=readInt("write the size of the array \n");
-
-}
-cout << "Enter " << size << " integers:\n";
-for(int i =0;i<size;i++){
-int input=readInt("");
-
-array.push_back(input);
-}
-heapSort(array);
-cout<<"after Sorting \n";
-for(int i =0;i<size;i++){
-cout<< array[i]<<' ' ;
-}
-cout<<endl;
-}
-
-
-
-
+// =============================== Small drivers ==============================
 static void runHeapDemo() {
-    cout << "Choose heap type: 1) Max Heap  2) Min Heap\n";
+    cout << "\n--- Heap Demo ---\n";
+    cout << "1) Max Heap\n2) Min Heap\n";
     int t = readInt("Type: ");
+
     int n = readInt("Enter number of elements: ");
-    while (n <= 0) { cout << "Invalid n\n"; n = readInt("Enter number of elements: "); }
+    while (n <= 0) {
+        cout << "Invalid n\n";
+        n = readInt("Enter number of elements: ");
+    }
+
     vector<int> v(n);
     cout << "Enter " << n << " integers:\n";
     for (int i = 0; i < n; ++i) v[i] = readInt("");
 
     if (t == 1) {
         MaxHeap h; h.build(v);
-        int k = readInt("How many extractions (max) to perform? ");
-        for (int i = 0; i < k; ++i) {
-            if (h.empty()) { cout << "Heap empty\n"; break; }
-            cout << "Extracted max: " << h.extractMax() << "\n";
+        cout << "Built Max-Heap.\n";
+        int q = readInt("How many operations? count: ");
+        while (q--) {
+            int op = readInt("op (1=insert, 2=extract): ");
+            if (op == 1) { int x = readInt("value: "); h.insert(x); }
+            else if (op == 2) { cout << "max= " << h.extractMax() << "\n"; }
+            else cout << "unknown op\n";
         }
     } else if (t == 2) {
         MinHeap h; h.build(v);
-        int k = readInt("How many extractions (min) to perform? ");
-        for (int i = 0; i < k; ++i) {
-            if (h.empty()) { cout << "Heap empty\n"; break; }
-            cout << "Extracted min: " << h.extractMin() << "\n";
+        cout << "Built Min-Heap.\n";
+        int q = readInt("How many operations? count: ");
+        while (q--) {
+            int op = readInt("op (1=insert, 2=extract): ");
+            if (op == 1) { int x = readInt("value: "); h.insert(x); }
+            else if (op == 2) { cout << "min= " << h.extractMin() << "\n"; }
+            else cout << "unknown op\n";
         }
     } else {
         cout << "Unknown type\n";
     }
 }
-static void runPriorityQueue() {
+
+static void runPriorityQueueDemo() {
+    cout << "\n--- Priority Queue ---\n";
     PriorityQueue pq;
-
-    int n = readInt("Enter number of elements to insert: ");
-    while (n <= 0) {
-        cout << "Invalid n\n";
-        n = readInt("Enter number of elements: ");
+    int n = readInt("How many items to insert? ");
+    while (n-- > 0) {
+        int val = readInt("value: ");
+        int pr  = readInt("priority: ");
+        pq.insert(val, pr);
     }
-
-    cout << "Enter " << n << " value-priority pairs:\n";
-    for (int i = 0; i < n; ++i) {
-        int value = readInt("Value: ");
-        int priority = readInt("Priority: ");
-        pq.insert(value, priority);
-    }
-
-    cout << "\nExtracting all elements by highest priority:\n";
-    // Extract all elements from the queue
-    for (int i = 0; i < n; i++) {
-        int extracted = pq.extractHighestPriority();
-        if (extracted == 0) {
-            cout << "Queue is empty, stopping extraction.\n";
-            break;
-        }
+    int k = readInt("How many extractions? ");
+    while (k-- > 0) {
+        int x = pq.extractHighestPriority();
+        cout << "extracted: " << x << "\n";
     }
 }
+
+static void runHeapSortDemo() {
+    cout << "\n--- Heap Sort ---\n";
+    int n = readInt("Array size: ");
+    while (n <= 0) { cout << "Invalid n\n"; n = readInt("Array size: "); }
+    vector<int> a(n);
+    cout << "Enter " << n << " integers:\n";
+    for (int i = 0; i < n; ++i) a[i] = readInt("");
+    heapSort(a);
+    cout << "After heapSort:\n";
+    for (int x : a) cout << x << ' ';
+    cout << '\n';
+}
+
 static void printMenu() {
     cout << "\nHeap / Priority Queue / Heap Sort\n";
     cout << "1) Heap (Max/Min)\n";
@@ -254,10 +202,8 @@ int main() {
         int choice = readInt("Choose: ");
         if (choice == 0) break;
         if (choice == 1) runHeapDemo();
-        else if (choice == 2) runPriorityQueue();
-        else if (choice == 3) { runHeapSort();
-
-             }
+        else if (choice == 2) runPriorityQueueDemo();
+        else if (choice == 3) runHeapSortDemo();
         else cout << "Unknown option\n";
     }
     cout << "Goodbye!\n";
