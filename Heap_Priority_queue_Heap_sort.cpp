@@ -29,8 +29,11 @@ class Heap {
         }
     }
 
-    void shiftDown(int i) {
+    void shiftDown(int i,int size=-1) {
         int n = (int)a.size();
+        if (size!=-1)
+            n=size;
+
         while (true) {
             int l = 2 * i + 1, r = 2 * i + 2, best = i;
             if (l < n && better(a[l], a[best])) best = l;
@@ -49,8 +52,26 @@ public:
         heapify();
     }
 
+
+
     void heapify() {
         for (int i = (int)a.size() / 2 - 1; i >= 0; --i) shiftDown(i);
+    }
+
+
+    void heapSortHelper(){
+
+        for(int i=a.size()-1;i>=0;i--){
+            swap(a[0],a[i]);
+            shiftDown(0,i);
+        }
+    }
+    void print(){
+        for (int i = 0; i < a.size(); ++i)
+        {
+            cout<<a[i]<<' ';
+        }
+        cout<<endl;
     }
 
     void insert(int x) {
@@ -114,8 +135,10 @@ public:
 // =============================== Heap Sort ===============================
 // Heap Sort (to be completed by teammates). Suggested: build MaxHeap then extract.
 static void heapSort(vector<int> &arr) {
-    // TODO: Implement using MaxHeap: build(arr), then repeatedly extractMax into the end.
-    cout << "[HeapSort] TODO: not implemented yet.\n";
+    Heap MaxHeap = Heap();
+    MaxHeap.build(arr);
+    MaxHeap.heapSortHelper();
+    MaxHeap.print();
 }
 
 // =============================== Small drivers ==============================
@@ -176,16 +199,17 @@ static void runPriorityQueueDemo() {
 }
 
 static void runHeapSortDemo() {
+
     cout << "\n--- Heap Sort ---\n";
     int n = readInt("Array size: ");
     while (n <= 0) { cout << "Invalid n\n"; n = readInt("Array size: "); }
     vector<int> a(n);
     cout << "Enter " << n << " integers:\n";
     for (int i = 0; i < n; ++i) a[i] = readInt("");
-    heapSort(a);
+
+
     cout << "After heapSort:\n";
-    for (int x : a) cout << x << ' ';
-    cout << '\n';
+    heapSort(a);
 }
 
 static void printMenu() {
