@@ -29,11 +29,8 @@ class Heap {
         }
     }
 
-    void shiftDown(int i,int size=-1) {
+    void shiftDown(int i) {
         int n = (int)a.size();
-        if (size!=-1)
-            n=size;
-
         while (true) {
             int l = 2 * i + 1, r = 2 * i + 2, best = i;
             if (l < n && better(a[l], a[best])) best = l;
@@ -52,26 +49,8 @@ public:
         heapify();
     }
 
-
-
     void heapify() {
         for (int i = (int)a.size() / 2 - 1; i >= 0; --i) shiftDown(i);
-    }
-
-
-    void heapSortHelper(){
-
-        for(int i=a.size()-1;i>=0;i--){
-            swap(a[0],a[i]);
-            shiftDown(0,i);
-        }
-    }
-    void print(){
-        for (int i = 0; i < a.size(); ++i)
-        {
-            cout<<a[i]<<' ';
-        }
-        cout<<endl;
     }
 
     void insert(int x) {
@@ -116,29 +95,40 @@ struct MinHeap {
     int extractMin() { return h.extractTop(); }
 };
 
-// =============================== Priority Queue ===============================
-// Priority Queue (to be completed by teammates). Suggested: use MaxHeap inside.
-class PriorityQueue {
-public:
-    void insert(int value, int priority) {
-        // TODO: Implement using MaxHeap with a (priority, value) encoding or pair.
-        // For now, just a stub so the program compiles and the menu runs.
-        cout << "[PQ] insert(value=" << value << ", priority=" << priority << ") -> TODO\n";
+struct PriorityQueue
+{
+    MaxHeap internalHeap;
+    const int ENCODING_MASK = 10000;
+
+    void insert(int value, int priority)
+    {
+        int encoded = priority * ENCODING_MASK + value;
+        internalHeap.insert(encoded);
+        cout << "Priority Queue: Inserted (Value: " << value << ", Priority: " << priority << "). Encoded Key: " << encoded << "\n";
     }
-    int extractHighestPriority() {
-        // TODO: Implement using the underlying MaxHeap instance.
-        cout << "[PQ] extractHighestPriority() -> TODO, returning 0\n";
-        return 0;
+
+    int extractHighestPriority()
+    {
+        if (internalHeap.empty())
+        {
+            cout << "Priority Queue: Cannot extract, the queue is empty. Returning 0 (sentinel).\n";
+            return 0;
+        }
+        int encoded = internalHeap.extractMax();
+
+        int extractedValue = encoded % ENCODING_MASK;
+        int extractedPriority = encoded / ENCODING_MASK; // For logging
+
+        cout << "Priority Queue: Extracted (Value: " << extractedValue << ", Priority: " << extractedPriority << ").\n";
+        return extractedValue;
     }
 };
 
 // =============================== Heap Sort ===============================
 // Heap Sort (to be completed by teammates). Suggested: build MaxHeap then extract.
 static void heapSort(vector<int> &arr) {
-    Heap MaxHeap = Heap();
-    MaxHeap.build(arr);
-    MaxHeap.heapSortHelper();
-    MaxHeap.print();
+    // TODO: Implement using MaxHeap: build(arr), then repeatedly extractMax into the end.
+    cout << "[HeapSort] TODO: not implemented yet.\n";
 }
 
 // =============================== Small drivers ==============================
@@ -199,17 +189,47 @@ static void runPriorityQueueDemo() {
 }
 
 static void runHeapSortDemo() {
-
     cout << "\n--- Heap Sort ---\n";
     int n = readInt("Array size: ");
     while (n <= 0) { cout << "Invalid n\n"; n = readInt("Array size: "); }
     vector<int> a(n);
     cout << "Enter " << n << " integers:\n";
     for (int i = 0; i < n; ++i) a[i] = readInt("");
-
-
-    cout << "After heapSort:\n";
     heapSort(a);
+    cout << "After heapSort:\n";
+    for (int x : a) cout << x << ' ';
+    cout << '\n';
+}
+static void runPriorityQueue()
+{
+    PriorityQueue pq;
+
+    int n = readInt("Enter number of elements to insert: ");
+    while (n <= 0)
+    {
+        cout << "Invalid n\n";
+        n = readInt("Enter number of elements: ");
+    }
+
+    cout << "Enter " << n << " value-priority pairs:\n";
+    for (int i = 0; i < n; ++i)
+    {
+        int value = readInt("Value: ");
+        int priority = readInt("Priority: ");
+        pq.insert(value, priority);
+    }
+
+    cout << "\nExtracting all elements by highest priority:\n";
+    // Extract all elements from the queue
+    for (int i = 0; i < n; i++)
+    {
+        int extracted = pq.extractHighestPriority();
+        if (extracted == 0)
+        {
+            cout << "Queue is empty, stopping extraction.\n";
+            break;
+        }
+    }
 }
 
 static void printMenu() {
